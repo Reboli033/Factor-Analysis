@@ -1,0 +1,264 @@
+---
+title: "Factor_Analysis"
+author: "S18825"
+date: "2024-04-06"
+output:
+  html_document:
+    df_print: paged
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+library(data.table)
+library(tidyverse)
+```
+
+
+```{r}
+library(janitor)
+library(factoextra)
+library(psych)
+```
+
+
+```{r}
+library(corrplot)
+
+
+```
+
+```{r}
+Football_Data=read_csv("../Football_Analysis/FootBall_data.csv")
+head(Football_Data)
+
+```
+
+
+
+```{r}
+Football_Data[is.na(data)] = 0
+```
+
+
+```{r}
+describe(Football_Data)
+```
+```{r}
+colnames(Football_Data)
+```
+```{r}
+nrow(Football_Data)
+ncol(Football_Data)
+```
+
+
+```{r}
+#vector_data=unlist(Football_Data)
+#numeric_football_data=as.numeric(vector_data)
+#clean_vector_data=vector_data[!is.na(as.numeric(vector_data))]
+#numeric_football_data=as.numeric(clean_vector_data)
+
+#apply(Football_Data,2,var)
+#Football_Data[is.na(Football_Data)] = 0
+```
+
+
+```{r}
+#SPEARMAN COORELATION
+#numeric_football_data=numeric_football_data[sapply(numeric_football_data,is.numeric)]
+numeric_data=Football_Data[,sapply(Football_Data,is.numeric)]
+head(numeric_data,5)
+```
+```{r}
+numeric_data_subset=numeric_data[,!(names(numeric_data)=="matches_played")]
+head(numeric_data_subset)
+
+```
+
+
+```{r}
+cor(numeric_data_subset,method = "spearman")
+```
+
+
+```{r}
+#MEAN
+apply(numeric_data_subset,2,mean)
+
+```
+```{r}
+#STANDARDIZE DATASET
+data_std <- apply(numeric_data_subset,2,scale)
+#COORELATION MATRIX
+cor_matrix = cor(data_std)
+#COVARIANCE MATRIX
+cov_matrix = cov(data_std)
+#KMO VALUE
+KMO(data_std)
+
+```
+
+
+```{r}
+apply(numeric_data_subset,2,mean)
+
+```
+
+
+```{r}
+data.cov = cov(data_std)
+data.eigen = eigen(data.cov)
+```
+
+
+```{r}
+data.eigen$values
+```
+
+
+```{r}
+data.eigen$vectors
+
+```
+
+
+```{r}
+#PROPORTION OF VARIANCE EXPLAINED
+PVE = data.eigen$values/sum(data.eigen$values)
+PVE
+```
+
+```{r}
+#SCREE PLOT
+scree(data_std)
+```
+
+
+```{r}
+plot(data.eigen$values,main = "Scree Plot",xlab = "Factors",ylab = "Eigen
+Values",pch=20,col = "blue")+lines(data.eigen$values,col ="red")+abline(h=1,col
+="green",lty = 2)
+```
+
+
+```{r}
+#PARALLEL ANALYSIS
+fa.parallel(data_std,fm = "pa",fa = "fa")
+```
+
+
+
+```{r}
+fourfactors = fa(r=data_std,nfactors = 4,rotate = "none",fm="pa")
+```
+
+
+```{r}
+print(fourfactors)
+```
+
+
+```{r}
+#FACTOR ANALYSIS USING PRINCIPAL COMPONENTS METHOD WITHOUT ROTATION
+data_std_fa_pc <- fa(data.cov,nfactors = 4,rotate = "none",n.obs = 128,covar =
+TRUE,fm = "pa")
+```
+
+```{r}
+data_std_fa_pc
+```
+
+
+```{r}
+fa.diagram(data_std_fa_pc)
+```
+
+
+```{r}
+#FACTOR LOADINGS
+data_std_fa_pc$loadings
+```
+
+
+```{r}
+unroated_pc_loadings <- as.data.frame(unclass(data_std_fa_pc$loadings))
+unroated_pc_loadings
+```
+
+
+```{r}
+unroated_pc_com <- as.data.frame(unclass(data_std_fa_pc$communality))
+unroated_pc_com
+```
+
+
+```{r}
+#FACTOR ANALYSIS USING MAXIMUM LIKELIHOOD METHOD WITH ROTATION
+data_std_fa_ml <- fa(data.cov,nfactors = 4,rotate = "none",n.obs = 128,covar =
+TRUE,fm = "pa")
+
+
+```
+
+
+```{r}
+data_std_fa_ml
+
+```
+
+
+```{r}
+unroated_ml_loadings <- as.data.frame(unclass(data_std_fa_pc$loadings))
+unroated_ml_loadings
+```
+```{r}
+unroated_ml_com <- as.data.frame(unclass(data_std_fa_pc$communality))
+unroated_ml_com
+```
+
+
+```{r}
+#FACTOR ANALYSIS USING PRINCIPAL COMPONENTS METHOD WITH ROTATION
+data_std_pc_rotate <- fa(data.cov,nfactors = 4,rotate = "varimax",n.obs =
+128,covar = TRUE,fm = "pa")
+
+```
+
+
+```{r}
+data_std_pc_rotate
+```
+```{r}
+data_std_pc_rotate$loadings
+
+```
+
+
+```{r}
+rotated_pc_loadings <- as.data.frame(unclass(data_std_pc_rotate$loadings))
+rotated_pc_loadings 
+```
+```{r}
+rotated_pc_com<- as.data.frame(unclass(data_std_pc_rotate$communality))
+rotated_pc_com 
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
